@@ -39,7 +39,7 @@ public class MyServiceImplTest {
 
   @Test
   public void getItemsFromMockServer() throws Exception {
-    List<Item> resp = listOf(10);
+    List<Item> resp = listOf();
     final String json = new Gson().toJson(resp);
     server.enqueue(new MockResponse().setBody(json));
 
@@ -65,19 +65,44 @@ public class MyServiceImplTest {
   @Test
   public void testWithCallMock() throws Exception {
     MyService sut = new MyServiceImpl(Constants.BASE_URL);
-    final String testTag = "blah";
-    sut.callMock(2000, testTag, new Callback<>(new Predicate<String>() {
+    final String testTag = "zeroeth";
+    long delay = 1000;
+    sut.callMock(delay, testTag, new Callback<>(new Predicate<String>() {
       @Override
       public boolean apply(String s) {
         return s.equals(testTag);
       }
     }));
+    Thread.sleep(3000);
   }
+
+  @Test
+  public void testWith2CallMock() throws Exception {
+    MyService sut = new MyServiceImpl(Constants.BASE_URL);
+    final String testTag = "first";
+    long delay = 0;
+    sut.callMock(delay, testTag, new Callback<>(new Predicate<String>() {
+      @Override
+      public boolean apply(String s) {
+        return s.equals(testTag);
+      }
+    }));
+
+    final String testTag1 = "second";
+    sut.callMock(1000, testTag1, new Callback<>(new Predicate<String>() {
+      @Override
+      public boolean apply(String s) {
+        return s.equals(testTag1);
+      }
+    }));
+    Thread.sleep(3000);
+  }
+
 
   private class Callback<T> implements RestCallback<T> {
     private Predicate<T> predicate;
 
-    public Callback(Predicate<T> predicate) {
+    Callback(Predicate<T> predicate) {
       this.predicate = predicate;
     }
 
@@ -93,9 +118,9 @@ public class MyServiceImplTest {
     }
   }
 
-  private List<Item> listOf(int count) {
-    List<Item> generated = new ArrayList();
-    for (int i = 0; i < count; i++) {
+  private List<Item> listOf() {
+    List<Item> generated = new ArrayList<>();
+    for (int i = 0; i < 10; i++) {
       generated.add(new Item(System.nanoTime() + i + "",
           new RandomString(10, ThreadLocalRandom.current()).nextString()));
     }

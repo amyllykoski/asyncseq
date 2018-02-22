@@ -4,8 +4,8 @@ import android.os.Handler;
 
 import com.amyllykoski.asyncseq.util.L;
 
-import static com.amyllykoski.asyncseq.worker.MyHandler.MSG_NOK;
-import static com.amyllykoski.asyncseq.worker.MyHandler.MSG_OK;
+import static com.amyllykoski.asyncseq.worker.ServiceHandler.MSG_NOK;
+import static com.amyllykoski.asyncseq.worker.ServiceHandler.MSG_OK;
 
 public class CallMock implements Runnable {
   private static final String TAG = CallMock.class.getSimpleName();
