@@ -1,4 +1,4 @@
-package com.amyllykoski.asyncseq;
+package com.amyllykoski.asyncseq.util;
 
 public class Constants {
   private Constants() {

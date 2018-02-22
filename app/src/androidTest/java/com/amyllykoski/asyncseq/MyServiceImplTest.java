@@ -4,9 +4,11 @@ import android.support.test.espresso.core.internal.deps.guava.base.Predicate;
 
 import com.amyllykoski.asyncseq.api.MyService;
 import com.amyllykoski.asyncseq.model.Item;
-import com.amyllykoski.asyncseq.model.RestCallback;
+import com.amyllykoski.asyncseq.api.RestCallback;
+import com.amyllykoski.asyncseq.util.Constants;
 import com.amyllykoski.asyncseq.util.L;
 import com.amyllykoski.asyncseq.util.RandomString;
+import com.amyllykoski.asyncseq.impl.MyServiceImpl;
 import com.google.gson.Gson;
 
 import org.junit.After;
@@ -35,6 +37,7 @@ public class MyServiceImplTest {
 
   @After
   public void tearDown() throws Exception {
+
   }
 
   @Test
@@ -47,7 +50,7 @@ public class MyServiceImplTest {
     sut.getItems(new RestCallback<List<Item>>() {
       @Override
       public void onResponse(List<Item> response) {
-        L.deb(TAG, String.format("Received: %s", response.toString()));
+        L.d(TAG, String.format("Received: %s", response.toString()));
         for (Item i : response) {
           assertTrue(json.contains(i.getDescription()));
           assertTrue(json.contains(i.getId()));
@@ -56,48 +59,47 @@ public class MyServiceImplTest {
 
       @Override
       public void onFailure(String error) {
-        L.err(TAG, error);
+        L.e(TAG, error);
         fail();
       }
     });
   }
 
   @Test
-  public void testWithCallMock() throws Exception {
+  public void testWithDooLoop() throws Exception {
     MyService sut = new MyServiceImpl(Constants.BASE_URL);
-    final String testTag = "zeroeth";
+    final String testTag = rndStr(8);
     long delay = 1000;
-    sut.callMock(delay, testTag, new Callback<>(new Predicate<String>() {
+    sut.doLoop(delay, testTag, new Callback<>(new Predicate<String>() {
       @Override
       public boolean apply(String s) {
         return s.equals(testTag);
       }
     }));
-    Thread.sleep(3000);
+    Thread.sleep(5000);
+    sut.close();
   }
 
   @Test
-  public void testWith2CallMock() throws Exception {
+  public void testWithNDooLoops() throws Exception {
     MyService sut = new MyServiceImpl(Constants.BASE_URL);
-    final String testTag = "first";
-    long delay = 0;
-    sut.callMock(delay, testTag, new Callback<>(new Predicate<String>() {
-      @Override
-      public boolean apply(String s) {
-        return s.equals(testTag);
-      }
-    }));
-
-    final String testTag1 = "second";
-    sut.callMock(1000, testTag1, new Callback<>(new Predicate<String>() {
-      @Override
-      public boolean apply(String s) {
-        return s.equals(testTag1);
-      }
-    }));
-    Thread.sleep(3000);
+    int N = 10;
+    for(int i = 0; i < N; i++)
+    {
+      final String testTag = rndStr(8);
+      long delay = i * 100;
+      sut.doLoop(delay, testTag, new Callback<>(new Predicate<String>()
+      {
+        @Override
+        public boolean apply(String s)
+        {
+          return s.equals(testTag);
+        }
+      }));
+    }
+    Thread.sleep(5000);
+    sut.close();
   }
-
 
   private class Callback<T> implements RestCallback<T> {
     private Predicate<T> predicate;
@@ -108,22 +110,25 @@ public class MyServiceImplTest {
 
     @Override
     public void onResponse(T response) {
-      L.deb(TAG, String.format("Received: %s", response));
+      L.d(TAG, String.format("Received: %s", response));
       assertTrue(predicate.apply(response));
     }
 
     @Override
     public void onFailure(String error) {
-      L.err(TAG, String.format("Error: %s", error));
+      L.e(TAG, String.format("Error: %s", error));
     }
   }
 
   private List<Item> listOf() {
     List<Item> generated = new ArrayList<>();
     for (int i = 0; i < 10; i++) {
-      generated.add(new Item(System.nanoTime() + i + "",
-          new RandomString(10, ThreadLocalRandom.current()).nextString()));
+      generated.add(new Item(String.format("%d", System.nanoTime() + i), rndStr(10)));
     }
     return generated;
+  }
+  
+  private String rndStr(int length){
+    return new RandomString(length, ThreadLocalRandom.current()).nextString();
   }
 }

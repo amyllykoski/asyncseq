@@ -1,4 +1,4 @@
-package com.amyllykoski.asyncseq.model;
+package com.amyllykoski.asyncseq.api;
 
 public interface RestCallback<T> {
 

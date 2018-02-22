@@ -1,7 +1,6 @@
 package com.amyllykoski.asyncseq.rest;
 
 import com.amyllykoski.asyncseq.model.Item;
-import com.amyllykoski.asyncseq.model.RestCallback;
 
 import java.util.List;
 

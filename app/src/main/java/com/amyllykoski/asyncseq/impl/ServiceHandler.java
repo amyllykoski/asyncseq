@@ -1,10 +1,10 @@
-package com.amyllykoski.asyncseq.worker;
+package com.amyllykoski.asyncseq.impl;
 
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
-import com.amyllykoski.asyncseq.model.RestCallback;
+import com.amyllykoski.asyncseq.api.RestCallback;
 
 public class ServiceHandler<T> extends Handler {
 
@@ -26,7 +26,7 @@ public class ServiceHandler<T> extends Handler {
   public void handleMessage(Message msg) {
     switch (msg.what) {
       case MSG_OK:
-        restCallback.onResponse((T) msg.obj);
+      if(msg.obj != null) restCallback.onResponse((T) msg.obj);
         break;
       default:
         String error = msg.obj != null ? msg.obj.toString() : "?";
