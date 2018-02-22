@@ -1,5 +1,7 @@
 package com.amyllykoski.asyncseq;
 
+import android.support.test.espresso.core.internal.deps.guava.base.Predicate;
+
 import com.amyllykoski.asyncseq.api.MyService;
 import com.amyllykoski.asyncseq.model.Item;
 import com.amyllykoski.asyncseq.model.RestCallback;
@@ -37,7 +39,7 @@ public class MyServiceImplTest {
 
   @Test
   public void getItemsFromMockServer() throws Exception {
-    List<Item> resp = listOf(10);
+    List<Item> resp = listOf();
     final String json = new Gson().toJson(resp);
     server.enqueue(new MockResponse().setBody(json));
 
@@ -61,33 +63,64 @@ public class MyServiceImplTest {
   }
 
   @Test
-  public void getItemsFromThread() throws Exception {
-    List<Item> resp = listOf(10);
-    final String json = new Gson().toJson(resp);
-    server.enqueue(new MockResponse().setBody(json));
-
-    MyService sut = new MyServiceImpl(server.url("/").toString());
-    sut.getItems(new RestCallback<List<Item>>() {
+  public void testWithCallMock() throws Exception {
+    MyService sut = new MyServiceImpl(Constants.BASE_URL);
+    final String testTag = "zeroeth";
+    long delay = 1000;
+    sut.callMock(delay, testTag, new Callback<>(new Predicate<String>() {
       @Override
-      public void onResponse(List<Item> response) {
-        L.deb(TAG, String.format("Received: %s", response.toString()));
-        for (Item i : response) {
-          assertTrue(json.contains(i.getDescription()));
-          assertTrue(json.contains(i.getId()));
-        }
+      public boolean apply(String s) {
+        return s.equals(testTag);
       }
-
-      @Override
-      public void onFailure(String error) {
-        L.err(TAG, error);
-        fail();
-      }
-    });
+    }));
+    Thread.sleep(3000);
   }
 
-  private List<Item> listOf(int count) {
-    List<Item> generated = new ArrayList();
-    for (int i = 0; i < count; i++) {
+  @Test
+  public void testWith2CallMock() throws Exception {
+    MyService sut = new MyServiceImpl(Constants.BASE_URL);
+    final String testTag = "first";
+    long delay = 0;
+    sut.callMock(delay, testTag, new Callback<>(new Predicate<String>() {
+      @Override
+      public boolean apply(String s) {
+        return s.equals(testTag);
+      }
+    }));
+
+    final String testTag1 = "second";
+    sut.callMock(1000, testTag1, new Callback<>(new Predicate<String>() {
+      @Override
+      public boolean apply(String s) {
+        return s.equals(testTag1);
+      }
+    }));
+    Thread.sleep(3000);
+  }
+
+
+  private class Callback<T> implements RestCallback<T> {
+    private Predicate<T> predicate;
+
+    Callback(Predicate<T> predicate) {
+      this.predicate = predicate;
+    }
+
+    @Override
+    public void onResponse(T response) {
+      L.deb(TAG, String.format("Received: %s", response));
+      assertTrue(predicate.apply(response));
+    }
+
+    @Override
+    public void onFailure(String error) {
+      L.err(TAG, String.format("Error: %s", error));
+    }
+  }
+
+  private List<Item> listOf() {
+    List<Item> generated = new ArrayList<>();
+    for (int i = 0; i < 10; i++) {
       generated.add(new Item(System.nanoTime() + i + "",
           new RandomString(10, ThreadLocalRandom.current()).nextString()));
     }

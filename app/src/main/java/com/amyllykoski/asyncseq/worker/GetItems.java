@@ -9,8 +9,8 @@ import java.io.IOException;
 
 import retrofit2.Response;
 
-import static com.amyllykoski.asyncseq.worker.MyHandler.MSG_NOK;
-import static com.amyllykoski.asyncseq.worker.MyHandler.MSG_OK;
+import static com.amyllykoski.asyncseq.worker.ServiceHandler.MSG_NOK;
+import static com.amyllykoski.asyncseq.worker.ServiceHandler.MSG_OK;
 
 public class GetItems implements Runnable {
   private static final String TAG = GetItems.class.getSimpleName();
