@@ -1,6 +1,8 @@
-package com.amyllykoski.asyncseq;
+package com.amyllykoski.asyncseq.util;
 
 import android.util.Log;
+
+import com.amyllykoski.asyncseq.BuildConfig;
 
 public class L {
   public static void deb(final String tag, final String msg) {
