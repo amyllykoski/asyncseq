@@ -6,9 +6,11 @@ import android.os.Message;
 
 import com.amyllykoski.asyncseq.model.RestCallback;
 
-import static com.amyllykoski.asyncseq.api.MyService.MSG_OK;
-
 public class MyHandler<T> extends Handler {
+
+  static final int MSG_OK = 1;
+  static final int MSG_NOK = 2;
+
 
   private RestCallback<T> restCallback;
 
