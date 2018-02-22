@@ -3,12 +3,12 @@ package com.amyllykoski.asyncseq;
 import android.support.test.espresso.core.internal.deps.guava.base.Predicate;
 
 import com.amyllykoski.asyncseq.api.MyService;
-import com.amyllykoski.asyncseq.model.Item;
 import com.amyllykoski.asyncseq.api.RestCallback;
+import com.amyllykoski.asyncseq.impl.MyServiceImpl;
+import com.amyllykoski.asyncseq.model.Item;
 import com.amyllykoski.asyncseq.util.Constants;
 import com.amyllykoski.asyncseq.util.L;
 import com.amyllykoski.asyncseq.util.RandomString;
-import com.amyllykoski.asyncseq.impl.MyServiceImpl;
 import com.google.gson.Gson;
 
 import org.junit.After;
@@ -84,15 +84,12 @@ public class MyServiceImplTest {
   public void testWithNDooLoops() throws Exception {
     MyService sut = new MyServiceImpl(Constants.BASE_URL);
     int N = 10;
-    for(int i = 0; i < N; i++)
-    {
+    for (int i = 0; i < N; i++) {
       final String testTag = rndStr(8);
       long delay = i * 100;
-      sut.doLoop(delay, testTag, new Callback<>(new Predicate<String>()
-      {
+      sut.doLoop(delay, testTag, new Callback<>(new Predicate<String>() {
         @Override
-        public boolean apply(String s)
-        {
+        public boolean apply(String s) {
           return s.equals(testTag);
         }
       }));
@@ -111,7 +108,8 @@ public class MyServiceImplTest {
     @Override
     public void onResponse(T response) {
       L.d(TAG, String.format("Received: %s", response));
-      assertTrue(predicate.apply(response));
+      assertTrue(String.format("%s matches with %s", predicate.toString(), response),
+          predicate.apply(response));
     }
 
     @Override
@@ -127,8 +125,8 @@ public class MyServiceImplTest {
     }
     return generated;
   }
-  
-  private String rndStr(int length){
+
+  private String rndStr(int length) {
     return new RandomString(length, ThreadLocalRandom.current()).nextString();
   }
 }

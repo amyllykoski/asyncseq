@@ -1,10 +1,12 @@
 package com.amyllykoski.asyncseq.impl;
 
 import android.os.HandlerThread;
+import android.os.MessageQueue;
 
 import com.amyllykoski.asyncseq.api.MyService;
-import com.amyllykoski.asyncseq.model.Item;
 import com.amyllykoski.asyncseq.api.RestCallback;
+import com.amyllykoski.asyncseq.model.Item;
+import com.amyllykoski.asyncseq.util.L;
 
 import java.util.Date;
 import java.util.List;
@@ -18,6 +20,7 @@ public class MyServiceImpl implements MyService {
     this.baseUrl = baseUrl;
     handlerThread = new HandlerThread(TAG + "-" + new Date().getTime(), HandlerThread.MIN_PRIORITY);
     handlerThread.start();
+    setIdleHandler();
   }
 
   @Override
@@ -34,8 +37,19 @@ public class MyServiceImpl implements MyService {
 
   @Override
   public void close() {
-    if(handlerThread != null) {
-        handlerThread.quitSafely();
+    if (handlerThread != null) {
+      handlerThread.quitSafely();
     }
+  }
+
+  private void setIdleHandler() {
+    MessageQueue.IdleHandler idleHandler = new MessageQueue.IdleHandler() {
+      @Override
+      public boolean queueIdle() {
+        L.d(TAG, "MessageQueue is idle.");
+        return true;
+      }
+    };
+    handlerThread.getLooper().getQueue().addIdleHandler(idleHandler);
   }
 }

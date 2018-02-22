@@ -13,7 +13,7 @@ public class DoLoop implements Runnable {
   private final Handler handler;
   private final String tag;
 
-  public DoLoop(long delayMillis, String tag, final Handler handler) {
+  DoLoop(long delayMillis, String tag, final Handler handler) {
     this.delayMillis = delayMillis;
     this.tag = tag;
     this.handler = handler;
