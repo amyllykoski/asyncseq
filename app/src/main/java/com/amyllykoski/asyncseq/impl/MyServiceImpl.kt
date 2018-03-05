@@ -2,6 +2,7 @@ package com.amyllykoski.asyncseq.impl
 
 import android.os.HandlerThread
 import android.os.MessageQueue
+import arrow.core.Either
 import com.amyllykoski.asyncseq.api.MyService
 import com.amyllykoski.asyncseq.model.Item
 import com.amyllykoski.asyncseq.util.L
@@ -16,8 +17,10 @@ class MyServiceImpl(private val baseUrl: String) : MyService {
     setIdleHandler()
   }
 
+  private val TIMEOUT = 10L
+
   override fun getItems(): List<Item> {
-    val items = MyCallback<List<Item>>()
+    val items = MyCallback<Either<String, List<Item>>>(TIMEOUT)
     val handler = ServiceHandler(handlerThread.looper, items)
     handler.post(GetItems(baseUrl, handler))
     return items.data as List<Item>
