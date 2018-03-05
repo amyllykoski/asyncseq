@@ -2,11 +2,10 @@ package com.amyllykoski.asyncseq.impl
 
 import android.os.HandlerThread
 import android.os.MessageQueue
-
 import com.amyllykoski.asyncseq.api.MyService
-import com.amyllykoski.asyncseq.api.RestCallback
 import com.amyllykoski.asyncseq.model.Item
 import com.amyllykoski.asyncseq.util.L
+import com.amyllykoski.asyncseq.util.MyCallback
 
 class MyServiceImpl(private val baseUrl: String) : MyService {
   private val handlerThread: HandlerThread
@@ -17,9 +16,11 @@ class MyServiceImpl(private val baseUrl: String) : MyService {
     setIdleHandler()
   }
 
-  override fun getItems(items: RestCallback<List<Item>>) {
+  override fun getItems(): List<Item> {
+    val items = MyCallback<List<Item>>()
     val handler = ServiceHandler(handlerThread.looper, items)
     handler.post(GetItems(baseUrl, handler))
+    return items.data as List<Item>
   }
 
   override fun close() {

@@ -21,10 +21,11 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 
 import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
 
 public class MyServiceImplTest {
   private static final String TAG = MyServiceImplTest.class.getSimpleName();
+  private static final int NUM_OF_ITEMS = 10;
+
   private MockWebServer server;
 
   @Before
@@ -39,47 +40,16 @@ public class MyServiceImplTest {
     server.enqueue(new MockResponse().setBody(json));
 
     MyService sut = new MyServiceImpl(server.url("/").toString());
-    sut.getItems(new RestCallback<List<Item>>() {
-      @Override
-      public void onResponse(List<Item> response) {
-        L.INSTANCE.d(TAG, String.format("Received: %s", response.toString()));
-        for (Item i : response) {
-          assertTrue(json.contains(i.getDescription()));
-          assertTrue(json.contains(i.getId()));
-        }
-      }
-
-      @Override
-      public void onFailure(String error) {
-        L.INSTANCE.e(TAG, error);
-        fail();
-      }
-    });
-  }
-
-  private class Callback<T> implements RestCallback<T> {
-    private Predicate<T> predicate;
-
-    Callback(Predicate<T> predicate) {
-      this.predicate = predicate;
-    }
-
-    @Override
-    public void onResponse(T response) {
-      L.INSTANCE.d(TAG, String.format("Received: %s", response));
-      assertTrue(String.format("%s matches with %s", predicate.toString(), response),
-          predicate.apply(response));
-    }
-
-    @Override
-    public void onFailure(String error) {
-      L.INSTANCE.e(TAG, String.format("Error: %s", error));
+    List<Item> response = sut.getItems();
+    for (Item i : response) {
+      assertTrue(json.contains(i.getDescription()));
+      assertTrue(json.contains(i.getId()));
     }
   }
 
   private List<Item> listOfItems() {
     List<Item> generated = new ArrayList<>();
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < NUM_OF_ITEMS; i++) {
       generated.add(new Item(String.format("%d", System.nanoTime() + i), rndStr(10)));
     }
     return generated;
