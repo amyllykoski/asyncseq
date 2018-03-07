@@ -7,7 +7,9 @@ import com.amyllykoski.asyncseq.api.RestCallbackWithEither
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.TimeUnit
 
+
 class MyCallback<T>(private val timeout: Long) : RestCallbackWithEither<T> {
+  private val UNKNOWN = "Unknown Error"
 
   private var msgs: ArrayBlockingQueue<Either<MyError, T>> = ArrayBlockingQueue(5)
 
@@ -27,7 +29,11 @@ class MyCallback<T>(private val timeout: Long) : RestCallbackWithEither<T> {
       } catch (e: InterruptedException) {
         e.printStackTrace()
       }
-      return if (retVal == null) Either.Left(AnotherError()) else retVal
+
+      return if (retVal == null)
+        Either.Left(AnotherError(UNKNOWN))
+      else
+        retVal
     }
 }
 

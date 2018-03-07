@@ -9,6 +9,6 @@ interface MyService {
 }
 
 sealed class MyError {
-  class AnotherError : MyError()
-  class ServerError : MyError()
+  object ServerError : MyError()
+  data class AnotherError(val msg: String) : MyError()
 }

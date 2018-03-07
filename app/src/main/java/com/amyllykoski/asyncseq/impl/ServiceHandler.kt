@@ -18,9 +18,9 @@ class ServiceHandler<T>(
     MSG_OK ->
       restCallback.onResponse(Either.Right(msg.obj as T))
     MSG_NOK ->
-      restCallback.onResponse(Either.Left(ServerError()))
+      restCallback.onResponse(Either.Left(ServerError))
     else ->
-      restCallback.onResponse(Either.Left(AnotherError()))
+      restCallback.onResponse(Either.Left(AnotherError(msg.obj as String)))
   }
 
   companion object {
