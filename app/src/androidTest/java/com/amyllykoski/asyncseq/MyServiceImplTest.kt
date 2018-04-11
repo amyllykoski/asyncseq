@@ -3,7 +3,6 @@ package com.amyllykoski.asyncseq
 import arrow.core.Either
 import com.amyllykoski.asyncseq.api.MyError
 import com.amyllykoski.asyncseq.impl.MyServiceImpl
-import com.amyllykoski.asyncseq.impl.await
 import com.amyllykoski.asyncseq.model.Item
 import com.amyllykoski.asyncseq.util.RandomString
 import com.google.gson.Gson
