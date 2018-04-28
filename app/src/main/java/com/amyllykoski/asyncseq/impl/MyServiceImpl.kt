@@ -9,7 +9,6 @@ import com.amyllykoski.asyncseq.util.MyCallback
 
 class MyServiceImpl(private val baseUrl: String) : MyService {
   private val handlerThread: HandlerThread
-  private val sTIMEOUT = 10L
 
   init {
     handlerThread = HandlerThread(TAG, HandlerThread.MIN_PRIORITY)
@@ -17,7 +16,7 @@ class MyServiceImpl(private val baseUrl: String) : MyService {
   }
 
   override fun getItems(): Either<MyError, List<Item>> {
-    val items = MyCallback<List<Item>>(sTIMEOUT)
+    val items = MyCallback<List<Item>>(Companion.TIMEOUT)
     val handler = ServiceHandler(handlerThread.looper, items)
     handler.post(GetItems(baseUrl, handler))
     return items.data
@@ -29,5 +28,6 @@ class MyServiceImpl(private val baseUrl: String) : MyService {
 
   companion object {
     private val TAG = MyServiceImpl::class.java.simpleName
+    private const val TIMEOUT = 10L
   }
 }

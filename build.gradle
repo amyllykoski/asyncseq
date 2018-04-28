@@ -2,7 +2,7 @@
 
 buildscript {
     ext {
-        kotlin_version = '1.2.31'
+        kotlin_version = '1.2.41'
     }
     repositories {
         google()
@@ -17,6 +17,19 @@ buildscript {
     }
 }
 
+plugins {
+    id "io.gitlab.arturbosch.detekt" version "1.0.0.RC6-4"
+}
+
+detekt {
+    version = "1.0.0.RC6-4"
+    defaultProfile {
+        input = "$projectDir/app/src/main/java"
+        config = "$projectDir/default-detekt-config.yml" // Code style rules file.
+        filters = ".*/res/.*,.*build/.*"
+    }
+}
+
 allprojects {
     repositories {
         google()
@@ -27,3 +40,5 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+
